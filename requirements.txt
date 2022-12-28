@@ -1,1 +1,4 @@
 pyside2
+pycairo
+PyGObject
+pydbus

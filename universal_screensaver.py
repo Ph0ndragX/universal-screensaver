@@ -168,6 +168,13 @@ class UniversalScreenSaver(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
+    if sys.platform == "linux" or sys.platform == "linux2":
+        import pydbus
+        pm = pydbus.SessionBus().get("org.freedesktop.PowerManagement", "/org/freedesktop/PowerManagement/Inhibit")
+        print(f"Has inhibit: {pm.HasInhibit()}")
+        inhibited = pm.Inhibit("Universal ScreenSaver", "Showing images and videos")
+        print(f"Has inhibit: {pm.HasInhibit()}")
+
     app = QtWidgets.QApplication([])
     window = UniversalScreenSaver(sys.argv[1:])
     window.showFullScreen()
