@@ -67,6 +67,8 @@ class Orchestrator:
 
         self._show_next_timer.stop()
 
+        print(f"Playing: {m.get_filename()}")
+
         if m.is_img():
             self._stacked_widget.setCurrentIndex(0)
             self._image_view.set_media(m)
