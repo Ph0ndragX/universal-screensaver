@@ -97,6 +97,8 @@ class VideoView(QtWidgets.QWidget):
     def __init__(self, parent, on_playback_finished):
         super().__init__(parent)
 
+        self._media = None
+
         self._on_playback_finished = on_playback_finished
 
         self._media_player = QMediaPlayer(self, QMediaPlayer.VideoSurface)
@@ -110,13 +112,20 @@ class VideoView(QtWidgets.QWidget):
 
         self._media_player.setVideoOutput(self._video_widget)
         self._media_player.mediaStatusChanged.connect(self.status_changed)
+        self._media_player.positionChanged.connect(self.position_changed)
 
     def set_media(self, media):
+        self._media = media
         self._media_player.setMedia(QMediaContent(QUrl.fromLocalFile(media.get_filename())))
         self._media_player.play()
 
     def status_changed(self, status):
         if status == QMediaPlayer.EndOfMedia:
+            self._on_playback_finished()
+
+    def position_changed(self, position):
+        # gif position if past its duration, it will probably loop indefinitely, force change
+        if position > self._media_player.duration() + 10:
             self._on_playback_finished()
 
     def flip_muted(self):
