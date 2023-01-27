@@ -26,6 +26,9 @@ class Media:
     def is_vid(self):
         return any([self._filename.lower().endswith(ext) for ext in VID_EXTENSIONS])
 
+    def should_ignore(self):
+        return self._filename.lower().endswith("thumbs.db")
+
 
 class MediaFinder:
     def __init__(self, media_collector):
@@ -33,7 +36,7 @@ class MediaFinder:
 
     def find_media(self):
         files = self._media_collector.load_media()
-        media = [Media(filename) for filename in files]
+        media = [Media(filename) for filename in files if not Media(filename).should_ignore()]
 
         for m in media:
             if not m.is_img() and not m.is_vid():
