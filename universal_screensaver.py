@@ -1,5 +1,3 @@
-import os
-import random
 import sys
 
 from PySide2 import QtWidgets
@@ -8,6 +6,8 @@ from PySide2.QtGui import QPixmap
 from PySide2.QtMultimedia import QMediaPlayer, QMediaContent
 from PySide2.QtMultimediaWidgets import QVideoWidget
 from PySide2.QtWidgets import QVBoxLayout, QStackedWidget
+
+import media_collector
 
 IMG_EXTENSIONS = [".jpg", ".jpeg", ".png"]
 VID_EXTENSIONS = [".gif", ".mp4", ".webm"]
@@ -28,16 +28,11 @@ class Media:
 
 
 class MediaFinder:
-    def __init__(self, dirs):
-        self._dirs = dirs
+    def __init__(self, media_collector):
+        self._media_collector = media_collector
 
     def find_media(self):
-        files = []
-        for d in self._dirs:
-            files = files + self._find_media(d)
-        print(f"Media finder found {len(files)} files")
-
-        random.shuffle(files)
+        files = self._media_collector.load_media()
         media = [Media(filename) for filename in files]
 
         for m in media:
@@ -46,21 +41,6 @@ class MediaFinder:
                 sys.exit(-1)
 
         return media
-
-    def _find_media(self, search_dir):
-        files = []
-
-        entries = os.listdir(search_dir)
-        print(f"Content of {search_dir} is {len(entries)} entries")
-
-        for entry in entries:
-            filename = os.path.join(search_dir, entry)
-            if os.path.isdir(filename):
-                files = files + self._find_media(filename)
-            else:
-                files.append(filename)
-
-        return files
 
 
 class Orchestrator:
@@ -163,7 +143,7 @@ class UniversalScreenSaver(QtWidgets.QMainWindow):
             self._stacked_widget,
             self._image_view,
             self._video_view,
-            MediaFinder(args),
+            MediaFinder(media_collector.MediaCollector(args[0])),
             self._show_next
         )
 
@@ -185,6 +165,7 @@ class UniversalScreenSaver(QtWidgets.QMainWindow):
 if __name__ == "__main__":
     if sys.platform == "linux" or sys.platform == "linux2":
         import pydbus
+
         pm = pydbus.SessionBus().get("org.freedesktop.PowerManagement", "/org/freedesktop/PowerManagement/Inhibit")
         print(f"Has inhibit: {pm.HasInhibit()}")
         inhibited = pm.Inhibit("Universal ScreenSaver", "Showing images and videos")
