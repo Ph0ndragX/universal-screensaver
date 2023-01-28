@@ -128,7 +128,8 @@ class VideoView(QtWidgets.QWidget):
 
     def position_changed(self, position):
         # gif position if past its duration, it will probably loop indefinitely, force change
-        if position > self._media_player.duration() + 10:
+        if self._media is not None and position > self._media_player.duration() + 10:
+            self._media = None
             self._on_playback_finished()
 
     def flip_muted(self):
