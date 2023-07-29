@@ -84,8 +84,6 @@ class Orchestrator:
 class ImageView(QtWidgets.QLabel):
     def __init__(self, parent):
         super().__init__(parent)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.setContentsMargins(0, 0, 0, 0)
         self.setAlignment(Qt.AlignCenter)
 
     def set_media(self, media):
@@ -142,7 +140,7 @@ class UniversalScreenSaver(QtWidgets.QMainWindow):
         self.setWindowFlag(Qt.FramelessWindowHint)
 
         self._image_view = ImageView(self)
-        self._video_view = VideoView(self, self._show_next)
+        self._video_view = VideoView(self, self.show_next)
 
         self._stacked_widget = QStackedWidget(self)
         self._stacked_widget.addWidget(self._image_view)
@@ -159,13 +157,14 @@ class UniversalScreenSaver(QtWidgets.QMainWindow):
             self._image_view,
             self._video_view,
             MediaFinder(media_collector.MediaCollector(args[0])),
-            self._show_next
+            self.show_next
         )
 
-        QTimer.singleShot(0, self._show_next)
-
-    def _show_next(self):
+    def show_next(self):
         self._orchestrator.next()
+
+    def resizeEvent(self, event):
+        self.show_next()
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -174,7 +173,7 @@ class UniversalScreenSaver(QtWidgets.QMainWindow):
         elif key == Qt.Key_Escape:
             self.close()
         elif key == Qt.Key_Space:
-            self._show_next()
+            self.show_next()
 
 
 if __name__ == "__main__":
