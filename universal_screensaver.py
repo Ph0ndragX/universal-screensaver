@@ -62,13 +62,14 @@ class Orchestrator:
         self._media = self._media_finder.find_media()
         self._media_idx = 0
 
+    def reset_timer(self):
+        self._show_next_timer.start()
+
     def next(self):
         m = self._media[self._media_idx]
         self._media_idx = self._media_idx + 1
         if self._media_idx == len(self._media):
             self._media_idx = 0
-
-        self._show_next_timer.stop()
 
         print(f"Playing: {m.get_filename()}")
 
@@ -174,6 +175,7 @@ class UniversalScreenSaver(QtWidgets.QMainWindow):
             self.close()
         elif key == Qt.Key_Space:
             self.show_next()
+            self._orchestrator.reset_timer()
 
 
 if __name__ == "__main__":
