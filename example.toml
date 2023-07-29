@@ -1,0 +1,7 @@
+[media]
+paths = [
+	"/home/user/test/media"
+]
+
+# Possible values: random, sorted (sorted alphabetically by paths)
+order = "random"
