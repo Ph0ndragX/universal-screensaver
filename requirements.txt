@@ -1,5 +1,3 @@
-pyside2
-pycairo
-PyGObject
+pyside6
 pydbus
 toml

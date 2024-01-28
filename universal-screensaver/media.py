@@ -1,6 +1,27 @@
 import os
 import random
+
 import toml
+
+IMG_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"]
+VID_EXTENSIONS = [".gif", ".mp4", ".webm"]
+IGNORED = ["thumbs.db"]
+
+
+class Media:
+    def __init__(self, filename):
+        self._filename = filename
+        if not (self.is_img() or self.is_vid()):
+            raise Exception(f"{filename} is neither a vid or an image")
+
+    def filename(self):
+        return self._filename
+
+    def is_img(self):
+        return any([self._filename.lower().endswith(ext) for ext in IMG_EXTENSIONS])
+
+    def is_vid(self):
+        return any([self._filename.lower().endswith(ext) for ext in VID_EXTENSIONS])
 
 
 class MediaCollector:
@@ -34,15 +55,24 @@ class MediaCollector:
             elif order == "sorted":
                 files.sort()
 
-        self._media = files
+        self._media = [Media(p) for p in files]
 
     def _find_media_in_path(self, search_dir):
         files = []
         for entry in os.listdir(search_dir):
             filename = os.path.join(search_dir, entry)
+            if self._should_ignore(filename):
+                continue
+
             if os.path.isdir(filename):
                 files = files + self._find_media_in_path(filename)
             else:
                 files.append(filename)
 
         return files
+
+    def _should_ignore(self, filename):
+        ignored = any([filename.lower().endswith(i) for i in IGNORED])
+        if ignored:
+            print(f"Ignoring file {filename}")
+        return ignored
